@@ -41,8 +41,7 @@ class BacktestTrader(CryptoTrader):
                     stop_loss = entry_price * (1 - self.config['STOP_LOSS_PCT'])
                     take_profit = entry_price * (1 + self.config['TAKE_PROFIT_PCT'])
 
-                    # Simula movimento futuro
-                    future_klines = klines[i:i+12]  # ~1 hora à frente
+                    future_klines = klines[i:i+12]  # até 1 hora depois
                     for future_k in future_klines:
                         high = float(future_k[2])
                         low = float(future_k[3])
@@ -65,26 +64,72 @@ class BacktestTrader(CryptoTrader):
                         self.resultados['total'].append((close_time, lucro))
 
     def plot_resultados(self):
-        df_total = pd.DataFrame(self.resultados['total'], columns=['timestamp', 'lucro'])
-        df_total['data'] = pd.to_datetime(df_total['timestamp'], unit='s')
-        df_total['lucro_acumulado'] = df_total['lucro'].cumsum()
+        for pair in self.config['PARES_MONITORADOS']:
+            dados = self.resultados.get(pair, [])
+            if not dados:
+                print(f"⚠️ Sem dados de lucro para {pair}")
+                continue
 
-        # Salva CSV
-        df_total.to_csv("lucros_backtest.csv", index=False)
+            df = pd.DataFrame(dados, columns=['timestamp', 'lucro'])
+            df['data'] = pd.to_datetime(df['timestamp'], unit='s')
+            df['lucro_acumulado'] = df['lucro'].cumsum()
+            lucro_total = df['lucro_acumulado'].iloc[-1]
+            entradas = len(df)
 
-        # Gera gráfico e salva como imagem
-        plt.figure(figsize=(10, 6))
-        plt.plot(df_total['data'], df_total['lucro_acumulado'], label='Lucro Total')
-        plt.title('Backtest - Lucro Acumulado (30 dias)')
-        plt.xlabel('Data')
-        plt.ylabel('Lucro (USDT)')
-        plt.grid(True)
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig("lucro_backtest.jpg")
+            # Gera gráfico
+            plt.figure(figsize=(10, 6))
+            plt.plot(df['data'], df['lucro_acumulado'], label=f'{pair}')
+            plt.title(f'{pair} - Lucro Acumulado (30 dias)\n'
+                      f'Lucro total: {lucro_total:.4f} USDT | Entradas: {entradas}')
+            plt.xlabel('Data')
+            plt.ylabel('Lucro (USDT)')
+            plt.grid(True)
+            plt.legend()
+            plt.tight_layout()
 
-        print("📊 Gráfico salvo como: lucro_backtest.jpg")
-        print("📁 CSV salvo como: lucros_backtest.csv")
+            # Salva gráfico
+            nome_arquivo = f'lucro_{pair}.jpg'
+            plt.savefig(nome_arquivo)
+            plt.close()
+
+            print(f"📈 Gráfico salvo: {nome_arquivo}")
+    def gerar_relatorio_final(self):
+        relatorio = []
+        lucro_total = 0
+        entradas_total = 0
+
+        relatorio.append("🔎 RELATÓRIO FINAL BACKTEST (últimos 30 dias)\n")
+        relatorio.append("="*50 + "\n")
+
+        for pair in self.config['PARES_MONITORADOS']:
+            dados = self.resultados.get(pair, [])
+            if not dados:
+                continue
+
+            df = pd.DataFrame(dados, columns=['timestamp', 'lucro'])
+            df['data'] = pd.to_datetime(df['timestamp'], unit='s')
+            df['lucro_acumulado'] = df['lucro'].cumsum()
+
+            lucro_par = df['lucro_acumulado'].iloc[-1]
+            entradas_par = len(df)
+
+            relatorio.append(f"{pair}:")
+            relatorio.append(f"  Entradas: {entradas_par}")
+            relatorio.append(f"  Lucro/Prejuízo: {lucro_par:.4f} USDT\n")
+
+            lucro_total += lucro_par
+            entradas_total += entradas_par
+
+        relatorio.append("="*50)
+        relatorio.append(f"Total de Entradas: {entradas_total}")
+        relatorio.append(f"Lucro/Prejuízo Final: {lucro_total:.4f} USDT")
+        relatorio.append("="*50)
+
+        # Salva no arquivo
+        with open("relatorio_backtest.txt", "w") as f:
+            f.write("\n".join(relatorio))
+
+        print("📄 Relatório final salvo: relatorio_backtest.txt")
 
 if __name__ == "__main__":
     print("🚀 Iniciando Backtest dos últimos 30 dias")
@@ -94,12 +139,12 @@ if __name__ == "__main__":
         'API_SECRET': API_SECRET,
         'PARES_MONITORADOS': PARES_MONITORADOS,
         'INTERVALO': INTERVALO,
-        'QUANTIDADE_CANDLES': QUANTIDADE_CANDLES,
+        'QUANTIDADE_CANDLES': 150,        # <- AUMENTADO
         'TAKE_PROFIT_PCT': TAKE_PROFIT_PCT,
         'STOP_LOSS_PCT': STOP_LOSS_PCT,
         'VALOR_OPERACAO_USD': VALOR_OPERACAO_USD,
-        'SCORE_MINIMO_ENTRADA': 65,            # <- AJUSTE AQUI
-        'VOLUME_MULTIPLIER': 1.5,              # <- AJUSTE AQUI
+        'SCORE_MINIMO_ENTRADA': 60,        # <- REDUZIDO
+        'VOLUME_MULTIPLIER': 1.2,          # <- REDUZIDO
         'RSI_PERIODO': RSI_PERIODO,
         'MACD_PERIODO_RAPIDO': MACD_PERIODO_RAPIDO,
         'MACD_PERIODO_LENTO': MACD_PERIODO_LENTO,
@@ -124,3 +169,5 @@ if __name__ == "__main__":
     backtester = BacktestTrader(config)
     backtester.start_backtest()
     backtester.plot_resultados()
+    backtester.gerar_relatorio_final()
+    
