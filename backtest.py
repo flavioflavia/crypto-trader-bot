@@ -65,20 +65,27 @@ class BacktestTrader(CryptoTrader):
                         self.resultados[pair].append((close_time, lucro))
                         self.resultados['total'].append((close_time, lucro))
 
-    def plot_resultados(self):
-        df_total = pd.DataFrame(self.resultados['total'], columns=['timestamp', 'lucro'])
-        df_total['data'] = pd.to_datetime(df_total['timestamp'], unit='s')
-        df_total['lucro_acumulado'] = df_total['lucro'].cumsum()
+def plot_resultados(self):
+    df_total = pd.DataFrame(self.resultados['total'], columns=['timestamp', 'lucro'])
+    df_total['data'] = pd.to_datetime(df_total['timestamp'], unit='s')
+    df_total['lucro_acumulado'] = df_total['lucro'].cumsum()
 
-        plt.figure(figsize=(10, 6))
-        plt.plot(df_total['data'], df_total['lucro_acumulado'], label='Lucro Total')
-        plt.title('Backtest - Lucro Acumulado (30 dias)')
-        plt.xlabel('Data')
-        plt.ylabel('Lucro (USDT)')
-        plt.grid(True)
-        plt.legend()
-        plt.tight_layout()
-        plt.show()
+    # Salva CSV
+    df_total.to_csv("lucros_backtest.csv", index=False)
+
+    # Gera gráfico e salva como imagem
+    plt.figure(figsize=(10, 6))
+    plt.plot(df_total['data'], df_total['lucro_acumulado'], label='Lucro Total')
+    plt.title('Backtest - Lucro Acumulado (30 dias)')
+    plt.xlabel('Data')
+    plt.ylabel('Lucro (USDT)')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("lucro_backtest.jpg")
+
+    print("📊 Gráfico salvo como: lucro_backtest.jpg")
+    print("📁 CSV salvo como: lucros_backtest.csv")
 
 if __name__ == "__main__":
     print("🚀 Iniciando Backtest dos últimos 30 dias")
