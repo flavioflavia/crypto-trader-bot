@@ -1,0 +1,15 @@
+# Logs
+*.log
+*.log.*
+
+# Arquivos sensíveis
+config_local.py
+*.env
+
+# Pycache
+__pycache__/
+*.pyc
+
+# Ambiente virtual
+venv/
+.env/
