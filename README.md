@@ -20,6 +20,7 @@ API_KEY = 'sua_api_key_aqui'
 API_SECRET = 'seu_api_secret_aqui'
 
 python3 main.py
+```
 
 ## ⚙️  Para rodar como serviço do linux faça o seguinte 
 
@@ -43,6 +44,7 @@ SyslogIdentifier=bot_trader
 
 [Install]
 WantedBy=multi-user.target
+```
 
 2. Configuração do Logrotate (/etc/logrotate.d/bot_trader)
 
@@ -60,6 +62,7 @@ WantedBy=multi-user.target
         systemctl restart bot_trader > /dev/null
     endscript
 }
+```
 
 3. Ative o serviço:
 
@@ -67,12 +70,14 @@ WantedBy=multi-user.target
 sudo systemctl daemon-reload
 sudo systemctl enable bot_trader
 sudo systemctl start bot_trader
+```
 
 4. Verifique os logs:
 
 ```bash
 journalctl -u bot_trader -f  # Logs do sistema
 tail -f /var/log/bot_trader.log  # Logs detalhados do bot
+```
 
 ##🛡️ Avisoo 
 Este bot é para fins educacionais. Use com cautela em ambientes de produção e nunca arrisque valores que não pode perder.
