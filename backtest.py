@@ -42,7 +42,7 @@ class BacktestTrader(CryptoTrader):
                     take_profit = entry_price * (1 + self.config['TAKE_PROFIT_PCT'])
 
                     # Simula movimento futuro
-                    future_klines = klines[i:i+12]  # 1 hora à frente
+                    future_klines = klines[i:i+12]  # ~1 hora à frente
                     for future_k in future_klines:
                         high = float(future_k[2])
                         low = float(future_k[3])
@@ -58,34 +58,33 @@ class BacktestTrader(CryptoTrader):
                             self.resultados[pair].append((close_time, lucro))
                             self.resultados['total'].append((close_time, lucro))
                             break
-                    # Se não atingiu SL ou TP
                     else:
                         last_price = float(future_klines[-1][4])
                         lucro = last_price - entry_price
                         self.resultados[pair].append((close_time, lucro))
                         self.resultados['total'].append((close_time, lucro))
 
-def plot_resultados(self):
-    df_total = pd.DataFrame(self.resultados['total'], columns=['timestamp', 'lucro'])
-    df_total['data'] = pd.to_datetime(df_total['timestamp'], unit='s')
-    df_total['lucro_acumulado'] = df_total['lucro'].cumsum()
+    def plot_resultados(self):
+        df_total = pd.DataFrame(self.resultados['total'], columns=['timestamp', 'lucro'])
+        df_total['data'] = pd.to_datetime(df_total['timestamp'], unit='s')
+        df_total['lucro_acumulado'] = df_total['lucro'].cumsum()
 
-    # Salva CSV
-    df_total.to_csv("lucros_backtest.csv", index=False)
+        # Salva CSV
+        df_total.to_csv("lucros_backtest.csv", index=False)
 
-    # Gera gráfico e salva como imagem
-    plt.figure(figsize=(10, 6))
-    plt.plot(df_total['data'], df_total['lucro_acumulado'], label='Lucro Total')
-    plt.title('Backtest - Lucro Acumulado (30 dias)')
-    plt.xlabel('Data')
-    plt.ylabel('Lucro (USDT)')
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig("lucro_backtest.jpg")
+        # Gera gráfico e salva como imagem
+        plt.figure(figsize=(10, 6))
+        plt.plot(df_total['data'], df_total['lucro_acumulado'], label='Lucro Total')
+        plt.title('Backtest - Lucro Acumulado (30 dias)')
+        plt.xlabel('Data')
+        plt.ylabel('Lucro (USDT)')
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig("lucro_backtest.jpg")
 
-    print("📊 Gráfico salvo como: lucro_backtest.jpg")
-    print("📁 CSV salvo como: lucros_backtest.csv")
+        print("📊 Gráfico salvo como: lucro_backtest.jpg")
+        print("📁 CSV salvo como: lucros_backtest.csv")
 
 if __name__ == "__main__":
     print("🚀 Iniciando Backtest dos últimos 30 dias")
@@ -113,7 +112,6 @@ if __name__ == "__main__":
         'BB_DESVIOS': BB_DESVIOS,
         'STOCH_K_PERIODO': STOCH_K_PERIODO,
         'STOCH_D_PERIODO': STOCH_D_PERIODO,
-        'VOLUME_MULTIPLIER': 1.5,
         'LOG_FILE': '/tmp/backtest.log',
         'LOG_LEVEL': 'ERROR',
         'TEMPO_MAXIMO_OPERACAO': 60 * 60,
