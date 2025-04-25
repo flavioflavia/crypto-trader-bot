@@ -170,7 +170,7 @@ class CryptoTrader:
                 
                     if balance_value < self.config.get('SALDO_MINIMO_USD', 6):  # Ignora saldos menores que $6
                         self.logger.warning(f"⚠️ SALDO INSIGNIFICANTE | {pair} | Valor: ${balance_value:.2f} | Ignorando...")
-                    continue
+                        continue
                     
                     self.current_position = {
                         'pair': pair,

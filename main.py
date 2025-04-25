@@ -72,13 +72,24 @@ def main():
     try:
         # Carrega configurações
         config = load_config()
+
+        # Adiciona cliente temporário para buscar saldo de USDT
+        from binance.client import Client
+        client = Client(config['API_KEY'], config['API_SECRET'])
+
+        try:
+            saldo_usdt = float(client.get_asset_balance(asset='USDT')['free'])
+            valor_operacao_dinamico = round(saldo_usdt * 0.9, 2)
+            config['VALOR_OPERACAO_USD'] = valor_operacao_dinamico
+            print(f"💰 Saldo USDT detectado: ${saldo_usdt:.2f} | Valor da operação ajustado para: ${valor_operacao_dinamico:.2f}")
+        except Exception as e:
+            print(f"⚠️ Erro ao consultar saldo na Binance: {str(e)}")
+            print("Usando valor fixo da configuração.")
         
         # Inicializa o bot
         bot = CryptoTrader(config)
         
         # Registro de inicialização
-        logging.basicConfig(level=config['LOG_LEVEL'])
-        logging.info("Iniciando bot com recuperação ativada")
         logging.info(f"Pares: {config['PARES_MONITORADOS']}")
         logging.info(f"Tempo máximo por operação: {config['TEMPO_MAXIMO_OPERACAO']/60} minutos")
         logging.info("Iniciando bot com os seguintes pares:")
