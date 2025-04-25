@@ -20,7 +20,7 @@ VERIFICACAO_INTERVALO = 30  # Tempo entre análises (segundos)
 VALOR_MINIMO_RESIDUAL = 6  # Ignorar saldos < $6
 
 # Sistema de Pontuação
-SCORE_MINIMO_ENTRADA = 75  # Score mínimo para entrada (0-100)
+SCORE_MINIMO_ENTRADA = 65  # Score mínimo para entrada (0-100)
 
 #############################################
 ### CONFIGURAÇÕES DE INDICADORES TÉCNICOS ###
@@ -51,7 +51,7 @@ STOCH_K_PERIODO = 14  # Período da linha K
 STOCH_D_PERIODO = 3   # Período da linha D
 
 # Volume
-VOLUME_MULTIPLIER = 2.0  # Mínimo 2.0x a média de volume
+VOLUME_MULTIPLIER = 1.5  # Mínimo 1.5x a média de volume
 
 #############################################
 ### CONFIGURAÇÕES DE LOG E MONITORAMENTO ###
