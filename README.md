@@ -79,5 +79,6 @@ journalctl -u bot_trader -f  # Logs do sistema
 tail -f /var/log/bot_trader.log  # Logs detalhados do bot
 ```
 
-##🛡️ Avisoo
+## 🛡️ Aviso
+
 Este bot é para fins educacionais. Use com cautela em ambientes de produção e nunca arrisque valores que não pode perder.
